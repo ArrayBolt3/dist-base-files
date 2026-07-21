@@ -1,3 +1,22 @@
+commit 3f5e1d7bcd0454283cb9ec8213671c796047adeb
+Merge: 12a3b14 cde234a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jul 21 05:06:26 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit cde234a81d1416abaa7d247883a10d68109adfe3
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sun Jul 19 21:23:40 2026 -0400
+
+    Remove obsolete Qubes version check, set default StandaloneVM boot mode to 'user'
+
+commit 12a3b142256cc8859792374f88a3070647e39e71
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 20 22:02:18 2026 +0000
+
+    bumped changelog version
+
 commit 0bb8ebf2fbe189354c41f9f4ad900677d476d558
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 20 16:56:47 2026 -0400
