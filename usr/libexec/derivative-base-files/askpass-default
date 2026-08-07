@@ -3,8 +3,16 @@
 ## Copyright (C) 2019 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-if [ "$sudo_password" = "" ]; then
-   sudo_password="changeme"
-fi
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
 
-echo "$sudo_password"
+## Overridable from the environment. Reading it bare aborts under nounset
+## before the default can apply; ':-' reproduces the previous behaviour
+## exactly -- unset OR empty yields the default, anything else is kept.
+sudo_password="${sudo_password:-changeme}"
+
+printf '%s\n' "${sudo_password}"
