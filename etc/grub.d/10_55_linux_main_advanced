@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# shellcheck disable=SC2034,SC3043,SC1091
+
 ## Copyright (C) 2019 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
@@ -7,7 +9,35 @@
 
 true "dist-base-files $0: START"
 
-set -e
+## shellcheck disable, with reasons -- these are not defects:
+##
+## SC2034 "appears unused": variables like make_boot_entry are consumed by
+## ANOTHER script. This generator sets them under 'set -o allexport' and then
+## executes /etc/grub.d/10_00_linux_dist, which reads them. shellcheck sees one
+## file, so a hand-off looks unused.
+##
+## SC3043 "'local' is undefined in POSIX sh": true of the standard, not of any
+## shell these actually run under -- grub-mkconfig invokes them with /bin/sh,
+## which is dash on Debian, and dash supports 'local'. Dropping it would make
+## every one of those variables GLOBAL inside a boot generator, which is a real
+## regression traded for a theoretical portability win.
+##
+## SC1091 "not following": the sourced paths are resolved at RUN time against
+## the caller's working directory, so there is no static path for shellcheck to
+## read. R-081 prescribes the disable for exactly that.
+
+## style-ok: no-strict
+##
+## POSIX 'sh', so R-010's six-directive preamble cannot apply: pipefail,
+## errtrace, inherit_errexit and shift_verbose are BASH-ONLY. 'set -eu' is
+## everything POSIX sh can express, and it buys the two that matter -- an
+## unhandled failure and an unset variable both stop the script instead of
+## generating a wrong boot entry.
+##
+## The shebang stays '/bin/sh' deliberately. grub-mkconfig executes these, and
+## putting bash on the boot-config path to satisfy a style rule would be a real
+## behavioural change for a cosmetic win.
+set -eu
 set -o allexport
 
 make_boot_entry='true'
@@ -15,15 +45,15 @@ make_boot_entry='true'
 : "${persistence_type:="PERSISTENT"}"
 : "${session_detail:="daily activities"}"
 
-grub_distributor_appendix="$persistence_type Mode | USER Session | $session_detail"
+grub_distributor_appendix="${persistence_type} Mode | USER Session | ${session_detail}"
 if [ -e '/usr/share/kicksecure/marker' ]; then
-   GRUB_DISTRIBUTOR="$grub_distributor_appendix"
+   GRUB_DISTRIBUTOR="${grub_distributor_appendix}"
 elif [ -e '/usr/share/anon-ws-base-files/workstation' ]; then
-   GRUB_DISTRIBUTOR="$grub_distributor_appendix"
+   GRUB_DISTRIBUTOR="${grub_distributor_appendix}"
 elif [ -e '/usr/share/anon-gw-base-files/gateway' ]; then
-   GRUB_DISTRIBUTOR="$grub_distributor_appendix"
+   GRUB_DISTRIBUTOR="${grub_distributor_appendix}"
 else
-   GRUB_DISTRIBUTOR="$grub_distributor_appendix"
+   GRUB_DISTRIBUTOR="${grub_distributor_appendix}"
 fi
 
 GRUB_DISABLE_RECOVERY="true"
