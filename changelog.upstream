@@ -1,3 +1,290 @@
+commit 622f0a3b68278f03b5a521f5758367a22f2d9eb7
+Merge: 9e26322 0b21619
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 23 01:01:53 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/ai'
+
+commit 0b21619d9696b495a2424d1dc624aa3eba0fdcd5
+Author: claude (dev272 e8b76afb-795c-4739-8ebd-023de854021e) <noreply@anthropic.com>
+Date:   Fri Aug 21 05:03:27 2026 -0400
+
+    dist-base-files: drop redundant duplicate 'set -o pipefail'; complete R-010 strict block
+
+    - Remove the redundant second 'set -o pipefail' repeated after 'shopt -s
+      shift_verbose'; add 'export LC_ALL=C' to complete the R-010 block.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 227e4572053ab45e6b7acf4702db6545fd1a6ad1
+Author: claude (dev272 e8b76afb-795c-4739-8ebd-023de854021e) <noreply@anthropic.com>
+Date:   Fri Aug 21 04:44:59 2026 -0400
+
+    grub.d: drop narrative history comments, keep functional directives
+
+    - 10_05_linux_main, 10_55_linux_main_advanced: remove the GRUB_DISTRIBUTOR
+      "four-branch conditional" history narrative and the verbose "shellcheck
+      disable, with reasons" / "style-ok: no-strict" rationale prose. Keep the
+      functional shellcheck-disable line and the style-ok: no-strict marker.
+      Split "set -eu" to long-form per R-013.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 67f6e13dea1bdf853dc8f071e39119436864a86a
+Author: claude (dev272 e8b76afb-795c-4739-8ebd-023de854021e) <noreply@anthropic.com>
+Date:   Fri Aug 21 04:35:51 2026 -0400
+
+    dist-base-files: source helper-scripts via HELPER_SCRIPTS_PATH, drop SC1091 disable
+
+    - etc/update-motd.d/30_dist-base-files: use source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/has.sh;
+      drop the dead '# shellcheck disable=SC1091' and the stale sibling note.
+    - .github/dm-consumer.yml: check out the helper-scripts sibling so the
+      pre-push-static gate's shellcheck follows the source.
+    - completed pre-existing whole-file style debt (R-010: export LC_ALL=C).
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 18cd33d6c475c8eafeb0e230e9c9937a9e8ac6ce
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Sat Aug 8 06:14:26 2026 -0400
+
+    grub.d: collapse a four-branch conditional that made one assignment
+
+    10_05_linux_main and 10_55_linux_main_advanced tested for the kicksecure marker,
+    the anon-ws workstation marker and the anon-gw gateway marker -- and every arm,
+    including the else, set GRUB_DISTRIBUTOR to the same value. The marker tests
+    decided nothing and the boot menu was identical on every distro.
+
+    The structure looked like three distros were once meant to get DIFFERENT
+    labels. Restoring that needs someone to say what each should read, which is
+    product text rather than a refactor -- so this collapses to the behaviour that
+    has actually shipped, not the behaviour that was intended.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    The emitted GRUB configuration is byte-identical, which is the check that
+    matters for a boot generator:
+
+      IDENTICAL  10_05_linux_main            (47 bytes)
+      IDENTICAL  10_55_linux_main_advanced   (56 bytes)
+
+    Harness: ~/strict-pass-tests/grub-test/emit.sh
+
+commit 96fedb1e4d77d8a06b257a2b4a76d4e903f2e9c7
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Sat Aug 8 05:14:04 2026 -0400
+
+    10_55_linux_main_advanced: name the script it actually executes
+
+    A blanket comment added in the strict-mode pass claimed this file executes
+    /etc/grub.d/10_00_linux_dist. It executes 10_50_linux_dist_advanced -- the
+    comment was written once and copied to both siblings without adjusting it.
+
+    Wrong comments in a boot generator are worse than no comment: the next reader
+    trusts them.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout.
+
+    This also closes the last coverage gap in the emitted-output harness
+    (~/strict-pass-tests/grub-test/emit.sh). It previously reported this file as
+    NOT-EXERCISED because it exec's a dist script that is not installed on the test
+    host, so it emitted nothing -- and 'identical empty output' is not evidence.
+
+    Both dist scripts are stubbed into a bind-mounted /etc/grub.d now. That closed a
+    second, quieter problem: 10_05_linux_main was running the HOST's real
+    10_00_linux_dist, so its 85 bytes were the host leaking into the comparison
+    rather than the fixture. With the stubs it emits a deterministic 47.
+
+    All six generators now compare IDENTICAL:
+
+      10_05_linux_main (47B), 10_20_linux_live (164B),
+      10_55_linux_main_advanced (56B), 10_60_linux_live_advanced (164B),
+      35_uefi-firmware (182B), 45_debugging (879B)
+
+    Canary: injecting a read of an unset variable into this file makes the case
+    DIFFER, so it is genuinely exercising the 'set -eu' behaviour and not just
+    comparing two empty strings.
+
+commit e4c004a10a4cf9d8c7d12d673860f2f08788a7ce
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Sat Aug 8 04:55:29 2026 -0400
+
+    CI: enrol in the pre-push static gate
+
+    This repo had no GitHub Actions workflow at all, so nothing verified its PRs on
+    the server side -- the only gate was ci-repro run locally.
+
+    The workflow file is the canonical consumer template, copied verbatim from
+    developer-meta-files/consumer-templates/.github/workflows/. It is managed: once
+    present, dm-packaging-helper-script's pkg_update_consumer_workflows keeps it in
+    sync, so it must not be hand-edited here.
+
+    Enrolment is deliberately a SEPARATE act from propagation: that function uses
+    pkg_update_if_exists, which only updates a workflow that already exists, and
+    pkg_install_dependabot_yml skips any repo with no .github/workflows/ directory.
+    Neither creates the first one. Hence this commit.
+
+    Scope: the repos this session actually changed and that ship shell code -- not
+    every repo lacking CI. Enrolling a repo consumes shared org-wide Actions
+    concurrency (20 jobs, the real limit; public repos are not minute-billed), so it
+    is worth spending where there is signal.
+
+    Verified BEFORE enrolling: 'ci-repro.sh --worktree' passes for this repo, so the
+    gate arrives green rather than turning someone's PR red on arrival.
+
+    NOTE, so it is not a surprise: creating .github/workflows/ makes this repo
+    eligible for the canonical .github/dependabot.yml on the next propagation pass,
+    which pkg_install_dependabot_yml installs into any repo that uses Actions.
+
+commit e7e19bb13fc92bada9b8ded1b92f87165eaf3f62
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Sat Aug 8 04:11:42 2026 -0400
+
+    grub.d generators: POSIX-sh strict mode ('set -eu')
+
+    R-010's six-directive preamble cannot apply here: pipefail, errtrace,
+    inherit_errexit and shift_verbose are BASH-ONLY. 'set -eu' is everything POSIX
+    sh can express, and it buys the two that matter -- an unhandled failure and an
+    unset variable both stop the script instead of generating a wrong boot entry.
+
+    The '#!/bin/sh' shebangs stay. grub-mkconfig executes these; putting bash on the
+    boot-config path to satisfy a style rule would be a real behavioural change for
+    a cosmetic win. Each file carries a 'style-ok: no-strict' waiver naming the four
+    directives POSIX sh cannot express.
+
+    Two REAL aborts 'set -u' would have introduced, found by running them
+    ---------------------------------------------------------------------
+
+    Both would have produced a broken boot menu, and neither is visible by reading:
+
+    - 35_uefi-firmware sources GRUB's OWN grub-mkconfig_lib, which reads
+      '$grub_probe'. grub-mkconfig sets that as a plain shell variable and NEVER
+      exports it, and generators run as separate processes -- so under 'set -u' the
+      library aborted on its own line 27, taking the UEFI Firmware Settings entry
+      with it. nounset is off around that source only, the same treatment as the
+      Xsession.d snippets and the user drop-ins earlier in this pass: upstream code
+      is not ours to hold to our preamble.
+
+    - 45_debugging reads GRUB_DISABLE_LINUX_UUID and GRUB_DISABLE_LINUX_PARTUUID,
+      which are NOT in grub-mkconfig's export lists. Defaulted. It runs only inside
+      a chroot build, which is exactly where it would have aborted.
+
+    30_serial_console.cfg is NOT given 'set -eu'
+    ---------------------------------------------
+
+    It lives in /etc/default/grub.d/, which grub-mkconfig SOURCES ('. "${x}"' at its
+    line 165), so a 'set' there would rewrite grub-mkconfig's OWN shell for the rest
+    of its run. Its executable bit is misleading; nothing execs it. It gets the
+    no-strict waiver instead, and its three 'echo' diagnostics became printf.
+
+    Waivers, each with its reason in the file
+    ------------------------------------------
+
+    - allow-echo: the 'echo' calls EMIT the grub configuration. They are the output
+      format, several are multi-line continuations whose exact bytes become the boot
+      menu, and rewriting them to printf would churn boot entries for no gain.
+    - SC2034: variables like make_boot_entry are consumed by ANOTHER script, set
+      under 'set -o allexport' and read by 10_00_linux_dist.
+    - SC3043 ('local' is undefined in POSIX sh): true of the standard, not of any
+      shell these run under. Dropping 'local' would make those variables GLOBAL
+      inside a boot generator -- a real regression for a theoretical portability win.
+    - SC2154: grub-mkconfig exports GRUB_DEVICE and friends, and pkgdatadir at its
+      line 37. Verified against /usr/sbin/grub-mkconfig, not assumed -- which is how
+      the two it does NOT export were found and defaulted in code instead.
+    - SC1091: sourced paths resolved at RUN time against the caller's directory.
+
+    Testing
+    -------
+
+    Gate exit 0 in an ISOLATED checkout, all five packages.
+
+    Each generator run under 'sh' with the environment grub-mkconfig actually
+    provides (its own export lists), plus an ischroot stub for the chroot path:
+
+      6 generators, no unset aborts
+
+    And the check that matters for a boot generator -- the EMITTED configuration,
+    byte for byte:
+
+      IDENTICAL  10_05_linux_main                    (85 bytes)
+      IDENTICAL  35_uefi-firmware_live-config-dist   (128 bytes)
+      IDENTICAL  45_debugging                        (457 bytes)
+      NOT-EXERCISED  10_20_linux_live, 10_55_linux_main_advanced, 10_60_linux_live_advanced
+
+    The three NOT-EXERCISED are reported as such, not as passes: they emit nothing
+    in this environment because they exit early, and 'identical empty output' is not
+    evidence. Covering them needs a live-boot fixture.
+
+    Canaries: removing the 'set +u' guard reproduces
+      grub-mkconfig_lib: 27: grub_probe: parameter not set
+    and removing the 45_debugging defaults reproduces
+      45_debugging: 52: GRUB_DISABLE_LINUX_UUID: parameter not set
+
+    Three test defects on the way, each one a case that proved nothing:
+    - 45_debugging exits unless in a chroot, so the loop reported 'ok' for a script
+      it had not run past line 31. An ischroot stub goes on PATH now, and the case
+      fails unless the dump is actually reached.
+    - the first stub used a shell function plus 'export -f' -- a BASHISM, and the
+      script runs under 'sh' as a separate process, so it never took effect and the
+      canary passed with the fix removed.
+    - 'identical' was reported for generators emitting 0 bytes.
+
+    One thing the terminal hid: the emitted-output diff looked identical until it
+    was re-read with 'sandbox run --raw'. The display sanitizer had replaced the
+    '<' in '<unset>', making a real difference invisible. That is why 45_debugging
+    defaults to EMPTY rather than a '<unset>' marker -- the marker changed the
+    emitted text, and on a boot generator byte-identical output is worth more than
+    a nicer debug string.
+
+commit 6dbf90931fb41571e64bcecd6aca40afe3688545
+Author: claude (dev163 38f9745c-aed1-4fb4-b6ae-9899f20f8de2) <noreply@anthropic.com>
+Date:   Fri Aug 7 08:20:20 2026 -0400
+
+    dist-base-files: R-010 strict for 6 standalone scripts
+
+    The four etc/grub.d scripts are deliberately NOT included -- see below.
+
+    Real nounset traps fixed, both the same idiom of reading a variable before
+    the line that defaults it:
+    - askpass-default: 'if [ "${sudo_password}" = "" ]' aborted before it could
+      fall back to the default. '${sudo_password:-changeme}' reproduces the old
+      behaviour exactly: unset OR empty yields the default, anything else is
+      kept. Getting that precise matters -- it is a password default.
+    - update-motd.d/30_dist-base-files: echo -> printf across its multi-line
+      banner blocks, and 'has' instead of 'command -v'.
+
+    Two shebangs were '#! /bin/sh' -- with a SPACE -- which my first pass did
+    not match, so bash-only directives (shopt, pipefail, errtrace) would have
+    been added to files still declaring /bin/sh and failed outright under dash.
+    Corrected, and every changed file re-checked for that mismatch.
+
+    etc/grub.d DEFERRED: those four are Debian-derived (grub's 10_linux
+    lineage) and carry heavy pre-existing debt -- 32 remaining 'echo' calls and
+    10 compact case arms. Crucially the echoes EMIT grub.cfg content through
+    nested command substitutions, e.g.
+    'echo "menuentry '$(echo "${title}" | grub_quote)' ..."'. Rewriting those
+    mechanically is not safe: the generated config has to stay byte-identical
+    or the machine may not boot. They need their own pass with a
+    generated-output diff as the test.
+
+    Verified in an ISOLATED checkout (ci-repro.sh), gate exit 0. Sandbox
+    differential vs the pre-change scripts, output AND exit code: 7 cases, all
+    identical.
+
+    Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+commit 9e26322227010e90a54c75301b6f4309a03af052
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jul 21 09:20:49 2026 +0000
+
+    bumped changelog version
+
 commit 3f5e1d7bcd0454283cb9ec8213671c796047adeb
 Merge: 12a3b14 cde234a
 Author: Patrick Schleizer <adrelanos@whonix.org>
