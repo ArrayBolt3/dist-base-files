@@ -3,6 +3,13 @@
 ## Copyright (C) 2020 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
+
 get_build_version_file() {
    if [ -f "/usr/share/whonix/build_timestamp" ]; then
       ## Originally, this was a Whonix specific script.
@@ -18,18 +25,18 @@ get_build_version_file() {
 }
 
 get_build_timestamp() {
-   BUILD_UNIXTIME="$(date -r "$build_version_file" +%s)"
-   BUILD_TIME="$(date -r "$build_version_file")"
+   BUILD_UNIXTIME="$(date -r "${build_version_file}" +%s)"
+   BUILD_TIME="$(date -r "${build_version_file}")"
 }
 
 get_build_version() {
-   BUILD_VERSION="$(cat "$build_version_file")"
+   BUILD_VERSION="$(cat "${build_version_file}")"
 }
 
 get_build_version_file
 get_build_timestamp
 get_build_version
 
-echo "BUILD_VERSION='$BUILD_VERSION'"
-echo "BUILD_UNIXTIME='$BUILD_UNIXTIME'"
-echo "BUILD_TIME='$BUILD_TIME'"
+printf '%s\n' "BUILD_VERSION='${BUILD_VERSION}'"
+printf '%s\n' "BUILD_UNIXTIME='${BUILD_UNIXTIME}'"
+printf '%s\n' "BUILD_TIME='${BUILD_TIME}'"
