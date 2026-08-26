@@ -1,3 +1,22 @@
+commit ba10889e0b9790985bfcb55c74fc8bf89f8f9a9e
+Merge: 8123002 23a2988
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 25 01:30:59 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/ai'
+
+commit 23a2988bd8f957bbce9b82e31ecae77ae19b56d8
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Mon Aug 24 23:29:35 2026 -0400
+
+    ci: drop orphaned consumer-pre-push-static.yml (reusable decommissioned)
+
+commit 81230023679a3beadd22d0910cac8ba80d694347
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 23 05:48:00 2026 +0000
+
+    bumped changelog version
+
 commit 622f0a3b68278f03b5a521f5758367a22f2d9eb7
 Merge: 9e26322 0b21619
 Author: Patrick Schleizer <adrelanos@whonix.org>
