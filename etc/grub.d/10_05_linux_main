@@ -9,9 +9,8 @@
 
 true "dist-base-files $0: START"
 
-## style-ok: no-strict
-set -o errexit
-set -o nounset
+## style-ok: no-strict - must maintain the same style as other grub.d scripts.
+set -e
 set -o allexport
 
 make_boot_entry='true'

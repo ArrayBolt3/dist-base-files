@@ -10,9 +10,6 @@ set -o errtrace
 shopt -s inherit_errexit
 shopt -s shift_verbose
 
-## Overridable from the environment. Reading it bare aborts under nounset
-## before the default can apply; ':-' reproduces the previous behaviour
-## exactly -- unset OR empty yields the default, anything else is kept.
 sudo_password="${sudo_password:-changeme}"
 
 printf '%s\n' "${sudo_password}"
