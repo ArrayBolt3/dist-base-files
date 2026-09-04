@@ -1,0 +1,11 @@
+## Copyright (C) 2026 - 2026 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+## AI-Assisted
+
+## Per-repo parameters for the derivative-maker consumer CI workflows.
+
+dist-ai-tests:
+  ## Check out the helper-scripts sibling so shellcheck can follow the
+  ## '${HELPER_SCRIPTS_PATH:-}' source instead of emitting SC1091.
+  helper-scripts: true
