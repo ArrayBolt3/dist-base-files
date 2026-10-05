@@ -1,17 +1,17 @@
 .\" generated with Ronn-NG/v0.10.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.10.1
-.TH "DSUDO" "8" "January 2020" "dist-base-files" "dist-base-files Manual"
+.TH "DSUDO" "8" "October 2026" "dist-base-files" "dist-base-files Manual"
 .SH "NAME"
 \fBdsudo\fR \- default password sudo
 .SH "SYNOPSIS"
 \fBdsudo [OPTIONS]\fR
 .SH "DESCRIPTION"
-Runs \fBsudo\fR default password "changeme"\.
+Runs \fBsudo\fR submitting the account's default EMPTY password\.
 .P
 Forwards all environment variables and parameters to \fBsudo\fR\.
 .P
-Sets \fBSUDO_ASKPASS=/usr/libexec/derivative\-base\-files/askpass\-default\fR which sets \fBsudo_password=changeme\fR \- unless environment variable \fBsudo_password\fR is already set to something else\.
+Sets \fBSUDO_ASKPASS=/usr/libexec/derivative\-base\-files/askpass\-default\fR which submits \fBsudo_password\fR (default: empty, matching the empty password Kicksecure accounts ship with) \- unless environment variable \fBsudo_password\fR is already set to something else (e\.g\. \fBsudo_password=changeme dsudo \|\.\|\.\|\.\fR for a legacy image)\.
 .P
-Useful for testing\.
+Useful for headless/automated root (no tty), where a plain \fBsudo \-n\fR is refused because an empty password still has to be submitted\.
 .SH "AUTHOR"
 This man page has been written by Patrick Schleizer (adrelanos@whonix\.org)\.
