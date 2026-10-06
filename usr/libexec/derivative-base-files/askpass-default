@@ -11,7 +11,4 @@ shopt -s inherit_errexit
 shopt -s shift_verbose
 export LC_ALL=C
 
-## Kicksecure accounts ship with an EMPTY password (not NOPASSWD), so the default submitted
-## password is EMPTY -- `dsudo ...` just works headlessly (the no-tty equivalent of pressing Enter
-## at the interactive sudo prompt). Override for a legacy image with `sudo_password=changeme dsudo`.
 printf '%s\n' "${sudo_password-}"
