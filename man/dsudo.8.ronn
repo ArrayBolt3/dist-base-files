@@ -10,18 +10,17 @@ dsudo(8) -- default password sudo
 `dsudo [OPTIONS]`
 
 ## DESCRIPTION
-Runs `sudo` submitting the account's default EMPTY password.
+Runs `sudo` submitting the account's default empty password.
 
 Forwards all environment variables and parameters to `sudo`.
 
 Sets `SUDO_ASKPASS=/usr/libexec/derivative-base-files/askpass-default`
-which submits `sudo_password` (default: empty, matching the empty
-password Kicksecure accounts ship with) - unless environment variable
-`sudo_password` is already set to something else (e.g.
+which submits an empty-by-default `sudo_password` unless environment
+variable `sudo_password` is already set to something else (e.g.
 `sudo_password=changeme dsudo ...` for a legacy image).
 
-Useful for headless/automated root (no tty), where a plain `sudo -n`
-is refused because an empty password still has to be submitted.
+Useful for headless/automated root, where a plain `sudo -n` is refused
+because an empty password still has to be submitted.
 
 ## AUTHOR
 This man page has been written by Patrick Schleizer (adrelanos@whonix.org).
