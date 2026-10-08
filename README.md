@@ -15,10 +15,6 @@ Creates system groups:
 * console
 * ssh
 
-Ships a systemd unit file dist-skel-first-boot.service
-which runs `/usr/libexec/helper-scripts/first-boot-skel`
-(part of helper-scripts) package.
-
 Simplifies sudo default lecture to only showing the default password once.
 
 Creates version file `/var/lib/dist-base-files/build_version`.
