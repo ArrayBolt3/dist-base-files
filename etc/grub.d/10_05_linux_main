@@ -15,7 +15,7 @@ set -o allexport
 
 make_boot_entry='true'
 
-## Scopes this entry's GRUB --id via 10_00_linux_dist (distinct id per boot mode).
+## TODO: Should we be adding this mechanism to the advanced boot options too?
 boot_mode_id='user'
 
 : "${persistence_type:="PERSISTENT"}"
